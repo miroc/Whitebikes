@@ -11,7 +11,7 @@ public class StandBikes {
     private Integer error;
     @SerializedName("content")
     @Expose
-    private List<String> content = null;
+    private List<Integer> content = null;
     @SerializedName("notes")
     @Expose
     private List<String> notes = null;
@@ -27,11 +27,11 @@ public class StandBikes {
         this.error = error;
     }
 
-    public List<String> getContent() {
+    public List<Integer> getContent() {
         return content;
     }
 
-    public void setContent(List<String> content) {
+    public void setContent(List<Integer> content) {
         this.content = content;
     }
 

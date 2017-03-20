@@ -11,7 +11,7 @@ public class StandBikes {
     private Integer error;
     @SerializedName("content")
     @Expose
-    private List<Integer> content = null;
+    private List<String> content = null;
     @SerializedName("notes")
     @Expose
     private List<String> notes = null;
@@ -27,11 +27,11 @@ public class StandBikes {
         this.error = error;
     }
 
-    public List<Integer> getContent() {
+    public List<String> getContent() {
         return content;
     }
 
-    public void setContent(List<Integer> content) {
+    public void setContent(List<String> content) {
         this.content = content;
     }
 
@@ -51,4 +51,13 @@ public class StandBikes {
         this.stacktopbike = stacktopbike;
     }
 
+    @Override
+    public String toString() {
+        return "StandBikes{" +
+                "error=" + error +
+                ", content=" + content +
+                ", notes=" + notes +
+                ", stacktopbike=" + stacktopbike +
+                '}';
+    }
 }

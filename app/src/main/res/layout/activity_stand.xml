@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="@dimen/stand_activity_app_bar_height"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -26,7 +26,8 @@
                 android:id="@+id/stand_image"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

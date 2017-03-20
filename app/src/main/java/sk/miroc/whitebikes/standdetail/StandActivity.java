@@ -1,15 +1,16 @@
 package sk.miroc.whitebikes.standdetail;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,7 +24,6 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.WhiteBikesApiOld;
@@ -34,9 +34,11 @@ import timber.log.Timber;
 public class StandActivity extends AppCompatActivity {
     public static final String EXTRA_STAND = "STAND";
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.stand_name) TextView standNameText;
     @BindView(R.id.stand_description) TextView standDescriptionText;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbarLayout;
     @BindView(R.id.stand_image) ImageView standImage;
+    @BindView(R.id.bikes_list) LinearLayout bikesList;
 
     @Inject WhiteBikesApiOld apiOld;
 
@@ -53,7 +55,10 @@ public class StandActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        toolbarLayout.setTitle(stand.getStandName());
+//        toolbarLayout.setTitle(stand.getStandName());
+
+        toolbarLayout.setTitle(" "); // TODO disable title in better way
+        standNameText.setText(stand.getStandName());
         standDescriptionText.setText(stand.getStandDescription());
 
         Call<StandBikes> call = apiOld.getStandBikes("list", stand.getStandName());
@@ -61,8 +66,9 @@ public class StandActivity extends AppCompatActivity {
         call.enqueue(new Callback<StandBikes>() {
             @Override
             public void onResponse(Call<StandBikes> call, Response<StandBikes> response) {
-                Timber.i("Loading stand bikes succeeded, code: %d", response.code());
-                showBikes(response.body());
+                Timber.i("Loading stand bikes succeeded, response: %s", response.toString());
+                Timber.d("StandBikes: %s", response.body());
+                addBikeButtons(response.body());
 
             }
             @Override
@@ -80,11 +86,26 @@ public class StandActivity extends AppCompatActivity {
         }
     }
 
-    private void showBikes(StandBikes standBikes) {
-        List<Integer> bikeNumbers = standBikes.getContent();
-        
+    private void addBikeButtons(StandBikes standBikes) {
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        List<String> bikeNumbers = standBikes.getContent();
+        for (String bikeNumber : bikeNumbers){
+            boolean broken = false;
+            if (bikeNumber.startsWith("*")){
+                bikeNumber = bikeNumber.substring(1);
+                broken = true;
+            }
+            View v = inflater.inflate(!broken ? R.layout.button_bike : R.layout.button_bike_broken, null);
+            Button button = (Button) v.findViewById(R.id.button);
+            button.setText(getResources().getString(R.string.bike_number, bikeNumber));
+            bikesList.addView(v);
+        }
     }
+
+//    private void addBikeButtons(){
+//        List<String> s = Arrays.asList("123","213","3123");
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {

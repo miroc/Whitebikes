@@ -1,6 +1,7 @@
 package sk.miroc.whitebikes.standdetail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,6 +31,8 @@ import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.WhiteBikesApiOld;
 import sk.miroc.whitebikes.data.models.Stand;
 import sk.miroc.whitebikes.data.models.StandBikes;
+import sk.miroc.whitebikes.map.MapsActivity;
+import sk.miroc.whitebikes.rentbike.RentBikeActivity;
 import timber.log.Timber;
 
 public class StandActivity extends AppCompatActivity {
@@ -54,8 +58,6 @@ public class StandActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-
-//        toolbarLayout.setTitle(stand.getStandName());
 
         toolbarLayout.setTitle(" "); // TODO disable title in better way
         standNameText.setText(stand.getStandName());
@@ -89,7 +91,9 @@ public class StandActivity extends AppCompatActivity {
     private void addBikeButtons(StandBikes standBikes) {
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        List<String> bikeNumbers = standBikes.getContent();
+//        List<String> bikeNumbers = standBikes.getContent();
+
+        List<String> bikeNumbers = Arrays.asList("*23","133","7");
         for (String bikeNumber : bikeNumbers){
             boolean broken = false;
             if (bikeNumber.startsWith("*")){
@@ -99,13 +103,19 @@ public class StandActivity extends AppCompatActivity {
             View v = inflater.inflate(!broken ? R.layout.button_bike : R.layout.button_bike_broken, null);
             Button button = (Button) v.findViewById(R.id.button);
             button.setText(getResources().getString(R.string.bike_number, bikeNumber));
+            button.setTag(Integer.parseInt(bikeNumber));
+            button.setOnClickListener(this::onRentButtonClicked);
             bikesList.addView(v);
         }
     }
 
-//    private void addBikeButtons(){
-//        List<String> s = Arrays.asList("123","213","3123");
-//    }
+    private void onRentButtonClicked(View view) {
+        int bikeNumber = (int) view.getTag();
+        Intent intent = new Intent(this, RentBikeActivity.class);
+        // TODO first ask in a dialog
+        intent.putExtra(RentBikeActivity.EXTRA_BIKE_NUMBER, bikeNumber);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -114,6 +124,9 @@ public class StandActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(menuItem);
     }
+
+
+
 
 
 }

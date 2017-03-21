@@ -17,4 +17,5 @@
 
     <string name="available_bikes">Available bikes:</string>
     <string name="bike_number">Bike %s</string>
+    <string name="title_activity_rent_bike">RentBikeActivity</string>
 </resources>

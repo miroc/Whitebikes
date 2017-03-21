@@ -5,11 +5,10 @@
     <!--<color name="colorPrimaryDark">#9e9e9e</color>-->
     <!--<color name="colorAccent">#8bc34a</color>-->
 
-    <color name="colorPrimary">#4CAF50</color>
-    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="colorPrimary">#fff</color>
+    <color name="colorPrimaryDark">#bdbdbd</color>
     <color name="colorAccent">#8BC34A</color>
 
     <color name="white">#fff</color>
     <color name="orange">#f0ad4e</color>
-
 </resources>

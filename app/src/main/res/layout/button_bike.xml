@@ -4,7 +4,7 @@
     android:id="@+id/button"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/colorPrimary"
-    app:backgroundTint="@color/colorPrimary"
+    android:backgroundTint="@color/colorAccent"
+    app:backgroundTint="@color/colorAccent"
     style="@style/Widget.AppCompat.Button.Colored"
     android:paddingBottom="@dimen/subtext_padding_bottom" />

@@ -6,11 +6,67 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="sk.miroc.whitebikes.rentbike.RentBikeActivity"
+    android:paddingLeft="@dimen/activity_margin_left"
+    android:paddingRight="@dimen/activity_margin_right"
     tools:showIn="@layout/activity_rent_bike">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="RENT BIKE TEST"/>
+        android:text="@string/open_code"
+        android:layout_marginTop="@dimen/text_margin"
+        android:id="@+id/textView3"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/open_code_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/blue_700"
+
+        android:textSize="@dimen/text_size_display_3"
+        android:layout_marginTop="@dimen/margin_small"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/change_code_to"
+        android:layout_marginTop="@dimen/primary_text_padding_top"
+        app:layout_constraintTop_toBottomOf="@+id/open_code_text"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/new_code_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_display_3"
+        android:textColor="@color/colorAccent"
+        android:layout_marginTop="@dimen/margin_small"
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+         />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/change_code_howto"
+        android:layout_marginTop="@dimen/margin_small"
+        app:layout_constraintTop_toBottomOf="@+id/new_code_text"
+        android:id="@+id/change_code_howto" />
+
+    <Button
+        android:id="@+id/confirm_button"
+        android:layout_width="363dp"
+        android:layout_height="wrap_content"
+        android:text="@string/confirm_code_change"
+        android:backgroundTint="@color/colorAccent"
+        app:backgroundTint="@color/colorAccent"
+        android:textColor="@color/white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="@dimen/text_margin"
+        app:layout_constraintTop_toBottomOf="@+id/change_code_howto" />
 
 </android.support.constraint.ConstraintLayout>

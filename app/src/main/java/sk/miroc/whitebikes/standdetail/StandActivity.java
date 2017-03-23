@@ -55,9 +55,11 @@ public class StandActivity extends AppCompatActivity {
 
         Stand stand = getIntent().getParcelableExtra(EXTRA_STAND);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        if (toolbar != null){
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
 
         toolbarLayout.setTitle(" "); // TODO disable title in better way
         standNameText.setText(stand.getStandName());
@@ -115,6 +117,7 @@ public class StandActivity extends AppCompatActivity {
         // TODO first ask in a dialog
         intent.putExtra(RentBikeActivity.EXTRA_BIKE_NUMBER, bikeNumber);
         startActivity(intent);
+        finish();
     }
 
     @Override

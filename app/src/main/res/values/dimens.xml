@@ -9,16 +9,19 @@
 
     <dimen name="line_height">48dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
 
     <!--https://material.io/guidelines/style/typography.html#typography-styles-->
     <dimen name="text_size_display">34sp</dimen>
     <dimen name="text_size_headline">24sp</dimen>
     <dimen name="text_size_subheading">16sp</dimen>
+    <dimen name="text_size_display_3">56sp</dimen> <!-- unlock PIN CODE -->
+    <dimen name="text_size_display_2">45sp</dimen>
+    <dimen name="text_size_display_1">34sp</dimen>
 
     <!--StandDetailActivity-->
     <dimen name="stand_activity_app_bar_height">280dp</dimen>
     <dimen name="primary_text_padding_top">24dp</dimen>
-    <dimen name="primary_text_padding_bottom">16dp</dimen>
     <dimen name="subtext_padding_top">16dp</dimen>
     <dimen name="subtext_padding_bottom">16dp</dimen>
 

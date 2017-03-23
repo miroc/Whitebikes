@@ -1,8 +1,10 @@
 package sk.miroc.whitebikes.map;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +13,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -58,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements
     @Inject
     WhiteBikesApiOld apiOld;
     @Inject
-    IconGenerator iconFactory;
+    IconGenerator iconGenerator;
 
     @BindView(R.id.find_my_location)
     FloatingActionButton findMyLocationButton;
@@ -169,7 +174,7 @@ public class MapsActivity extends AppCompatActivity implements
                 List<Stand> standsList = response.body();
                 Timber.d("Response code: %d, standsCount: %d", responseCode, standsList.size());
 
-                addStands(standsList);
+                addStandsToMap(standsList);
             }
 
             @Override
@@ -179,15 +184,35 @@ public class MapsActivity extends AppCompatActivity implements
         });
     }
 
-    private void addStands(List<Stand> stands) {
+    private void addStandsToMap(List<Stand> stands) {
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        int redColor = ContextCompat.getColor(this, R.color.red);
+        int greenColor = ContextCompat.getColor(this, R.color.green_bike);
+        int blueColor = ContextCompat.getColor(this, R.color.blue_bike_repair);
+
+
         for (Stand stand : stands) {
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(
-                    (iconFactory.makeIcon(stand.getStandName())));
+            View v = inflater.inflate(R.layout.map_bike_icon, null);
+            TextView bikeCountText = (TextView) v.findViewById(R.id.bike_count);
+            ImageView bikeIcon = (ImageView) v.findViewById(R.id.bike_icon);
+            if (stand.getStandName().contains("SERVIS")){
+                bikeIcon.setColorFilter(blueColor);
+            } else if (stand.getBikecount().equals("0")){
+                bikeIcon.setColorFilter(redColor);
+            } else {
+                bikeIcon.setColorFilter(greenColor);
+            }
+
+
+            bikeCountText.setText(stand.getBikecount());
+            iconGenerator.setContentView(v);
+
+            Bitmap bitmap = iconGenerator.makeIcon(stand.getStandName());
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
             try {
                 MarkerOptions markerSpec = new MarkerOptions()
                         .position(stand.getLatLng())
                         .icon(icon);
-//                        .title(stand.getStandName());
 
                 map.addMarker(markerSpec).setTag(stand);
                 map.setOnMarkerClickListener(marker -> {

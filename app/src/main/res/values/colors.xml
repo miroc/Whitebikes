@@ -7,8 +7,16 @@
 
     <color name="colorPrimary">#fff</color>
     <color name="colorPrimaryDark">#bdbdbd</color>
-    <color name="colorAccent">#8BC34A</color>
+    <color name="colorAccent">#44aa00</color>
 
     <color name="white">#fff</color>
     <color name="orange">#f0ad4e</color>
+
+    <color name="blue_700">#1976D2</color>
+    <color name="blue_bike_repair">#7793AA</color>
+    <color name="green_bike">#44aa00</color>
+    <color name="red">#F44336</color>
+    <color name="black">#000</color>
+
+
 </resources>

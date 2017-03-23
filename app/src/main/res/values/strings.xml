@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WhiteBikes</string>
+    <string name="app_name">White Bikes</string>
     <string name="title_activity_maps">WhiteBikes</string>
     <string name="title_activity_stand">StandActivity</string>
     <string name="large_text">
@@ -18,4 +18,8 @@
     <string name="available_bikes">Available bikes:</string>
     <string name="bike_number">Bike %s</string>
     <string name="title_activity_rent_bike">RentBikeActivity</string>
+    <string name="open_code">Open code:</string>
+    <string name="change_code_to">Change code immediately to:</string>
+    <string name="confirm_code_change">Confirm code change</string>
+    <string name="change_code_howto">(open, rotate metal part, set new code, rotate metal part back)</string>
 </resources>

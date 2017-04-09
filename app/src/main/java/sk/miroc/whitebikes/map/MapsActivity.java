@@ -107,19 +107,14 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-//        map.setOnMyLocationButtonClickListener(this);
 
         // Move camera to bratislava
         LatLng bratislava = new LatLng(48.145, 17.1071373);
-//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLng(bratislava));
         map.moveCamera(CameraUpdateFactory.zoomTo(15));
 
         loadStands();
         enableMyLocation();
-//        googleMap.getUiSettings().setMapToolbarEnabled(false);
-//        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-//        googleMap.getUiSettings().setCompassEnabled(true);
     }
 
     private void enableMyLocation() {

@@ -7,12 +7,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -50,7 +55,6 @@ import sk.miroc.whitebikes.standdetail.StandActivity;
 import sk.miroc.whitebikes.utils.PermissionUtils;
 import timber.log.Timber;
 
-// ak chcem bez horneho baru tak fragmentActivity
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
@@ -58,15 +62,16 @@ public class MapsActivity extends AppCompatActivity implements
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private GoogleMap map;
 
-    @Inject
-    Retrofit retrofit;
-    @Inject
-    WhiteBikesApiOld apiOld;
-    @Inject
-    IconGenerator iconGenerator;
+    @Inject Retrofit retrofit;
+    @Inject WhiteBikesApiOld apiOld;
+    @Inject IconGenerator iconGenerator;
 
-    @BindView(R.id.find_my_location)
-    FloatingActionButton findMyLocationButton;
+    @BindView(R.id.find_my_location) FloatingActionButton findMyLocationButton;
+    @BindView(R.id.navigation_view) NavigationView navigationView;
+    @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+
+    private ActionBarDrawerToggle navDrawerToggle;
 
     private boolean permissionDenied = false;
     private GoogleApiClient googleApiClient;
@@ -79,7 +84,11 @@ public class MapsActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         ((WhiteBikesApp) getApplication()).getNetComponent().inject(this);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+        initNavDrawer();
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -94,13 +103,37 @@ public class MapsActivity extends AppCompatActivity implements
         }
     }
 
+    private void initNavDrawer() {
+        navDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer){
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+        drawerLayout.addDrawerListener(navDrawerToggle);
+        navDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onPostCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onPostCreate(savedInstanceState, persistentState);
+        navDrawerToggle.syncState();
+    }
+
     @OnClick(R.id.find_my_location)
     void onFindMyLocationClick(View view){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             Timber.i("Finding last location: %s", lastLocation);
-            LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            if (lastLocation != null){
+                LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
         }
     }
 
@@ -140,10 +173,8 @@ public class MapsActivity extends AppCompatActivity implements
 
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
             enableMyLocation();
         } else {
-            // Display the missing permission error dialog when the fragments resume.
             permissionDenied = true;
         }
     }
@@ -252,11 +283,13 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Timber.d("Connected to google location services");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 //                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            if (lastLocation != null){
+                LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
         }
     }
 

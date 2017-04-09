@@ -36,10 +36,7 @@
                 />
         </LinearLayout>
 
-        <View android:id="@+id/tile_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/dividerVertical" />
+        <include layout="@layout/view_divider" />
 
         <TextView
             android:layout_width="wrap_content"

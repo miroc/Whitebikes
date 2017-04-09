@@ -36,7 +36,8 @@
 
         <activity
             android:name=".map.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".standdetail.StandActivity"

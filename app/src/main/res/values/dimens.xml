@@ -1,11 +1,10 @@
 <resources>
-
     <dimen name="fab_margin">16dp</dimen>
-
-
-    <!--https://material.io/guidelines/layout/metrics-keylines.html#metrics-keylines-keylines-spacing-->
     <dimen name="activity_margin_left">16dp</dimen>
     <dimen name="activity_margin_right">16dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
 
     <dimen name="line_height">48dp</dimen>
     <dimen name="text_margin">16dp</dimen>

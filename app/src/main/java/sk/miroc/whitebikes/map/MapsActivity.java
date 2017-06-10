@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,8 +50,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
-import sk.miroc.whitebikes.data.WhiteBikesApiOld;
+import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.data.models.Stand;
+import sk.miroc.whitebikes.profile.ProfileActivity;
 import sk.miroc.whitebikes.standdetail.StandActivity;
 import sk.miroc.whitebikes.utils.PermissionUtils;
 import timber.log.Timber;
@@ -63,8 +65,11 @@ public class MapsActivity extends AppCompatActivity implements
     private GoogleMap map;
 
     @Inject Retrofit retrofit;
-    @Inject WhiteBikesApiOld apiOld;
+    @Inject OldApi oldApi;
     @Inject IconGenerator iconGenerator;
+
+    Retrofit retrofitWithCookies;
+    OldApi oldApiWithCookies;
 
     @BindView(R.id.find_my_location) FloatingActionButton findMyLocationButton;
     @BindView(R.id.navigation_view) NavigationView navigationView;
@@ -82,7 +87,11 @@ public class MapsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
-        ((WhiteBikesApp) getApplication()).getNetComponent().inject(this);
+        ((WhiteBikesApp) getApplication()).getApplicationComponent().inject(this);
+//
+//        // cookies
+//        retrofitWithCookies = TempUtils.getRetrofitWithCookies(this);
+//        oldApiWithCookies = retrofitWithCookies.create(OldApi.class);
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -101,20 +110,33 @@ public class MapsActivity extends AppCompatActivity implements
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            navDrawerItemClicked(item);
+            return false;
+        });
+    }
+
+
+
+
+    private void navDrawerItemClicked(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.profile: {
+                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.history:
+                Timber.d("HISTORY CLICKED");
+                break;
+            default:
+                Timber.w("Unknown menuItem ID clicked: %d", item.getItemId());
+        }
     }
 
     private void initNavDrawer() {
-        navDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer){
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-        };
+        navDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer);
         drawerLayout.addDrawerListener(navDrawerToggle);
         navDrawerToggle.syncState();
     }
@@ -191,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements
 
     private void loadStands() {
         Timber.d("loadStands");
-        Call<List<Stand>> call = apiOld.getStands("map:markers");
+        Call<List<Stand>> call = oldApi.getStands("map:markers");
         call.enqueue(new Callback<List<Stand>>() {
             @Override
             public void onResponse(Call<List<Stand>> call, Response<List<Stand>> response) {
@@ -265,16 +287,6 @@ public class MapsActivity extends AppCompatActivity implements
         googleApiClient.disconnect();
     }
 
-//    @Override
-//    public boolean onMyLocationButtonClick() {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            map.moveCamera(CameraUpdateFactory.newLatLng(lastLocation.get));
-//        }
-//        return false;
-//    }
-
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
@@ -285,7 +297,6 @@ public class MapsActivity extends AppCompatActivity implements
         Timber.d("Connected to google location services");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (lastLocation != null){
                 LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng));

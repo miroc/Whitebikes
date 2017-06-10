@@ -2,6 +2,7 @@ package sk.miroc.whitebikes;
 
 import android.app.Application;
 
+import sk.miroc.whitebikes.data.ApiModule;
 import timber.log.Timber;
 
 /**
@@ -10,15 +11,15 @@ import timber.log.Timber;
 
 public class WhiteBikesApp extends Application {
     public static final String BASE_URL = "http://whitebikes.info/";
-    private NetComponent netComponent;
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        netComponent = DaggerNetComponent.builder()
-                .appModule(new AppModule(this))
-                .netModule(new NetModule(BASE_URL))
+        applicationComponent = DaggerApplicationComponent.builder()
+                .androidModule(new AndroidModule(this))
+                .apiModule(new ApiModule(BASE_URL))
                 .build();
 
         if (BuildConfig.DEBUG) {
@@ -28,7 +29,7 @@ public class WhiteBikesApp extends Application {
         }
     }
 
-    public NetComponent getNetComponent() {
-        return netComponent;
+    public ApplicationComponent getApplicationComponent() {
+        return applicationComponent;
     }
 }

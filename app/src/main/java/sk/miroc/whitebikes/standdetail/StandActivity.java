@@ -28,10 +28,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
-import sk.miroc.whitebikes.data.WhiteBikesApiOld;
+import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.data.models.Stand;
 import sk.miroc.whitebikes.data.models.StandBikes;
-import sk.miroc.whitebikes.map.MapsActivity;
 import sk.miroc.whitebikes.rentbike.RentBikeActivity;
 import timber.log.Timber;
 
@@ -44,13 +43,13 @@ public class StandActivity extends AppCompatActivity {
     @BindView(R.id.stand_image) ImageView standImage;
     @BindView(R.id.bikes_list) LinearLayout bikesList;
 
-    @Inject WhiteBikesApiOld apiOld;
+    @Inject OldApi apiOld;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stand);
-        ((WhiteBikesApp)getApplication()).getNetComponent().inject(this);
+        ((WhiteBikesApp)getApplication()).getApplicationComponent().inject(this);
         ButterKnife.bind(this);
 
         Stand stand = getIntent().getParcelableExtra(EXTRA_STAND);

@@ -1,8 +1,5 @@
 package sk.miroc.whitebikes.data;
 
-
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -11,20 +8,49 @@ import dagger.Provides;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
+import sk.miroc.whitebikes.login.service.CookiesRepository;
+import sk.miroc.whitebikes.utils.networking.AddCookiesInterceptor;
+import sk.miroc.whitebikes.utils.networking.ReceivedCookiesInterceptor;
 
 @Module
 public class ClientModule {
-
-    private static final String HTTP_CACHE_PATH = "http-cache";
-    private static final String CACHE_CONTROL = "Cache-Control";
-    private static final String PRAGMA = "Pragma";
+    @Singleton
+    @Provides
+    public OkHttpClient provideOkHttpClient(HttpLoggingInterceptor loggingInterceptor,
+                                            AddCookiesInterceptor cookiesInterceptor,
+                                            ReceivedCookiesInterceptor receivedCookiesInterceptor,
+                                            @Named("isDebug") boolean isDebug){
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.followRedirects(false);
+        builder.addInterceptor(cookiesInterceptor);
+        builder.addInterceptor(receivedCookiesInterceptor);
+        if (isDebug){
+            builder.addInterceptor(loggingInterceptor);
+        }
+        return builder.build();
+    }
 
     @Singleton
     @Provides
-    public OkHttpClient provideOkHttpClient(){
-        OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
-        return okHttpClient.build();
+    public HttpLoggingInterceptor provideHttpLoggingInterceptor() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        return logging;
     }
+
+    @Provides
+    @Singleton
+    public AddCookiesInterceptor provideAddCookiesInterceptor(CookiesRepository repository){
+        return new AddCookiesInterceptor(repository);
+    }
+
+    @Provides
+    @Singleton
+    public ReceivedCookiesInterceptor provideReceivedCookiesInterceptor(CookiesRepository repository){
+        return new ReceivedCookiesInterceptor(repository);
+    }
+
 
     @Singleton
     @Provides

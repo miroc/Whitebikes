@@ -25,9 +25,8 @@ public interface OldApi {
     @GET("/command.php")
     Call<StandBikes> getStandBikes(@Query("action") String action, @Query("stand") String stand);
 
-
     // call with ?action=login
     @FormUrlEncoded
     @POST("/command.php")
-    Call<List<Stand>> getStands(@Query("action") String action, @Field("number") String number, @Field("password") String password);
+    Call<List<Stand>> login(@Query("action") String action, @Field("number") String number, @Field("password") String password);
 }

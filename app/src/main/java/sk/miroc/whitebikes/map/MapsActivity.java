@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +53,7 @@ import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.data.models.Stand;
+import sk.miroc.whitebikes.login.service.LoginService;
 import sk.miroc.whitebikes.profile.ProfileActivity;
 import sk.miroc.whitebikes.standdetail.StandActivity;
 import sk.miroc.whitebikes.utils.PermissionUtils;
@@ -67,9 +69,7 @@ public class MapsActivity extends AppCompatActivity implements
     @Inject Retrofit retrofit;
     @Inject OldApi oldApi;
     @Inject IconGenerator iconGenerator;
-
-    Retrofit retrofitWithCookies;
-    OldApi oldApiWithCookies;
+    @Inject LoginService loginService;
 
     @BindView(R.id.find_my_location) FloatingActionButton findMyLocationButton;
     @BindView(R.id.navigation_view) NavigationView navigationView;
@@ -88,10 +88,6 @@ public class MapsActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
         ((WhiteBikesApp) getApplication()).getApplicationComponent().inject(this);
-//
-//        // cookies
-//        retrofitWithCookies = TempUtils.getRetrofitWithCookies(this);
-//        oldApiWithCookies = retrofitWithCookies.create(OldApi.class);
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -117,9 +113,6 @@ public class MapsActivity extends AppCompatActivity implements
         });
     }
 
-
-
-
     private void navDrawerItemClicked(MenuItem item){
         switch (item.getItemId()){
             case R.id.profile: {
@@ -127,9 +120,16 @@ public class MapsActivity extends AppCompatActivity implements
                 startActivity(intent);
                 break;
             }
-            case R.id.history:
-                Timber.d("HISTORY CLICKED");
+
+            case R.id.logout: {
+                loginService.logout();
+                Toast.makeText(this, getString(R.string.user_logged_out), Toast.LENGTH_SHORT).show();
                 break;
+            }
+
+//            case R.id.history:
+//                Timber.d("HISTORY CLICKED");
+//                break;
             default:
                 Timber.w("Unknown menuItem ID clicked: %d", item.getItemId());
         }

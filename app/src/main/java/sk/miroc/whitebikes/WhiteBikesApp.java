@@ -2,7 +2,10 @@ package sk.miroc.whitebikes;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
+
 import sk.miroc.whitebikes.data.ApiModule;
+import sk.miroc.whitebikes.utils.MyDebugTree;
 import timber.log.Timber;
 
 /**
@@ -23,9 +26,8 @@ public class WhiteBikesApp extends Application {
                 .build();
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        } else {
-//            Timber.plant(new CrashReportingTree());
+            Stetho.initializeWithDefaults(this);
+            Timber.plant(new MyDebugTree());
         }
     }
 

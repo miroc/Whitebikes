@@ -1,12 +1,14 @@
 package sk.miroc.whitebikes.data;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
@@ -21,19 +23,30 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    public OldApi provideBackendApiService(Retrofit retrofit) {
+    public OldApi provideOldApi(Retrofit retrofit) {
         return retrofit.create(OldApi.class);
     }
 
+//    @Provides
+//    @Singleton
+//    public Retrofit provideRetrofit(Converter.Factory converterFactory,
+//                                    OkHttpClient okHttpClient) {
+//        return new Retrofit.Builder()
+//                .baseUrl(baseUrl)
+//                .addConverterFactory(converterFactory)
+//                .client(okHttpClient)
+//                .build();
+//    }
+
     @Provides
     @Singleton
-    public Retrofit provideRetrofit(Converter.Factory converterFactory,
-                                    OkHttpClient okHttpClient) {
+    public Retrofit provideRetrofitWithCookies(
+            Converter.Factory converterFactory,
+            OkHttpClient okHttpClient){
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
-                .addConverterFactory(converterFactory)
-//                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(okHttpClient)
+                .addConverterFactory(converterFactory)
                 .build();
     }
 
@@ -42,6 +55,7 @@ public class ApiModule {
     public Converter.Factory provideGsonConverterFactory(Gson gson) {
         return GsonConverterFactory.create(gson);
     }
+
 
     @Singleton
     @Provides

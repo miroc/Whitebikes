@@ -1,38 +1,32 @@
 package sk.miroc.whitebikes.utils.networking;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
 
 import okhttp3.Interceptor;
 import okhttp3.Response;
-import sk.miroc.whitebikes.utils.TempUtils;
+import sk.miroc.whitebikes.login.service.CookiesRepository;
+import timber.log.Timber;
 
 public class ReceivedCookiesInterceptor implements Interceptor {
-    private Context context;
-    HashSet<String> cookies;
-    public ReceivedCookiesInterceptor(Context context) {
-        this.context = context;
-        this.cookies = TempUtils.getCookiesPreferences(context);
+    private final CookiesRepository repository;
+    public ReceivedCookiesInterceptor(CookiesRepository repository) {
+        this.repository = repository;
     }
+
     @Override
     public Response intercept(Chain chain) throws IOException {
+
         Response originalResponse = chain.proceed(chain.request());
-
         if (!originalResponse.headers("Set-Cookie").isEmpty()) {
-//            HashSet<String> cookies = (HashSet<String>) PreferenceManager.getDefaultSharedPreferences(context)
-//                    .getStringSet("PREF_COOKIES", new HashSet<String>());
-
-            for (String header : originalResponse.headers("Set-Cookie")) {
-                cookies.add(header);
+            Set<String> cookies = repository.getSet();
+            for (String cookie : originalResponse.headers("Set-Cookie")){
+                Timber.d("Intercepting cookie: %s", cookie);
+                cookies.add(cookie);
             }
 
-            SharedPreferences.Editor memes = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            memes.putStringSet("PREF_COOKIES", cookies).apply();
-            memes.commit();
+            repository.saveSet(cookies);
         }
         return originalResponse;
     }

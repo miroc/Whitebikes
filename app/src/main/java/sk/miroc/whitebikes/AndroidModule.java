@@ -3,6 +3,7 @@ package sk.miroc.whitebikes;
 import android.content.Context;
 import android.content.res.Resources;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -26,5 +27,12 @@ public class AndroidModule {
     @Singleton
     Resources provideResources() {
         return application.getResources();
+    }
+
+    @Provides
+    @Singleton
+    @Named("isDebug")
+    boolean provideIsDebug() {
+        return BuildConfig.DEBUG;
     }
 }

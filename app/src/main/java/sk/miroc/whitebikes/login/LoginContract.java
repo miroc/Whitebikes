@@ -7,20 +7,15 @@ import sk.miroc.whitebikes.base.BaseView;
 public interface LoginContract {
 
     interface View extends BaseView<Presenter> {
-        void errorEmptyEmail();
-
-        void errorInvalidEmail();
-
-        void errorEmptyPassword();
+        void gotoPreviousActivity();
 
         void errorInvalidCredentials();
-
         void errorUnknown();
 
-        void gotoMealsScreen();
+        void informLoginSuccessful();
     }
 
     interface Presenter extends BasePresenter {
-        void login(String email, String password);
+        void login(String number, String password);
     }
 }

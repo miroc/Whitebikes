@@ -1,13 +1,19 @@
 package sk.miroc.whitebikes.profile;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import sk.miroc.whitebikes.R;
+import javax.inject.Inject;
 
-public class ProfileActivity extends AppCompatActivity {
+import sk.miroc.whitebikes.R;
+import sk.miroc.whitebikes.WhiteBikesApp;
+import sk.miroc.whitebikes.login.LoginActivity;
+
+public class ProfileActivity extends AppCompatActivity implements ProfileContract.View {
+    @Inject ProfileContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +28,33 @@ public class ProfileActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.profile);
         }
 
+        DaggerProfileComponent.builder()
+                .profilePresenterModule(new ProfilePresenterModule(this))
+                .applicationComponent(
+                        ((WhiteBikesApp) getApplication()).getApplicationComponent()).build()
+                .inject(this);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // handle arrow click here
-        }
-        return super.onOptionsItemSelected(item);
+    protected void onResume() {
+        super.onResume();
+        presenter.start();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void setPresenter(ProfileContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void gotoLoginScreen() {
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 }

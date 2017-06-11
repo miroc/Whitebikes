@@ -26,4 +26,12 @@
     <string name="closeDrawer">Close drawer</string>
     <string name="ride_history">Ride history</string>
     <string name="profile">Profile</string>
+    <string name="log_in">Log in</string>
+    <string name="phone_number">Phone number</string>
+    <string name="password">Password</string>
+    <string name="errorInvalidCredentials">Invalid credentials</string>
+    <string name="errorUnableToLogIn">Unable to log in. Try again later please.</string>
+    <string name="loginSuccessful">Login succesful</string>
+    <string name="logout">Logout</string>
+    <string name="user_logged_out">User successfully logged out</string>
 </resources>

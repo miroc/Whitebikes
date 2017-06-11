@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="user_logged_out" type="id">User successfully logged out</item>
+</resources>

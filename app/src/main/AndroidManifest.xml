@@ -36,16 +36,17 @@
 
         <activity
             android:name=".map.MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_maps">
+        </activity>
         <activity
             android:name=".standdetail.StandActivity"
-            android:label="@string/title_activity_stand"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_stand"/>
         <activity
             android:name=".rentbike.RentBikeActivity"
-            android:label="@string/title_activity_rent_bike"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_rent_bike"/>
+        <activity
+            android:name=".login.LoginActivity">
+        </activity>
         <activity
             android:name=".splash.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -56,8 +57,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".profile.ProfileActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:name=".profile.ProfileActivity">
         </activity>
     </application>
 

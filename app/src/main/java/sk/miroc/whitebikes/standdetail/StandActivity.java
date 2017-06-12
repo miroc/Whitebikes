@@ -44,12 +44,12 @@ public class StandActivity extends AppCompatActivity {
     @BindView(R.id.bikes_list) LinearLayout bikesList;
 
     @Inject OldApi apiOld;
+    @Inject LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stand);
-        ((WhiteBikesApp)getApplication()).getApplicationComponent().inject(this);
         ButterKnife.bind(this);
 
         Stand stand = getIntent().getParcelableExtra(EXTRA_STAND);
@@ -60,6 +60,8 @@ public class StandActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
+        ((WhiteBikesApp)getApplication()).getApplicationComponent().inject(this);
+
         toolbarLayout.setTitle(" "); // TODO disable title in better way
         standNameText.setText(stand.getStandName());
         standDescriptionText.setText(stand.getStandDescription());
@@ -69,10 +71,9 @@ public class StandActivity extends AppCompatActivity {
         call.enqueue(new Callback<StandBikes>() {
             @Override
             public void onResponse(Call<StandBikes> call, Response<StandBikes> response) {
-                Timber.i("Loading stand bikes succeeded, response: %s", response.toString());
+                Timber.i("Loading stand bikes succeeded, response: %s", response.body());
                 Timber.d("StandBikes: %s", response.body());
                 addBikeButtons(response.body());
-
             }
             @Override
             public void onFailure(Call<StandBikes> call, Throwable t) {
@@ -80,21 +81,16 @@ public class StandActivity extends AppCompatActivity {
             }
         });
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show());
-
         if (stand.getStandPhoto() != null && !stand.getStandPhoto().isEmpty()){
             Glide.with(this).load(stand.getStandPhoto()).into(standImage);
         }
     }
 
     private void addBikeButtons(StandBikes standBikes) {
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        Timber.i("Adding bike buttons, obj: %s", bikeNumbersOrig);
 
-//        List<String> bikeNumbers = standBikes.getContent();
-
-        List<String> bikeNumbers = Arrays.asList("*23","133","7");
+//        List<String> bikeNumbers = Arrays.asList("*23","133","7");
+        List<String> bikeNumbers = standBikes.getContent();
         for (String bikeNumber : bikeNumbers){
             boolean broken = false;
             if (bikeNumber.startsWith("*")){

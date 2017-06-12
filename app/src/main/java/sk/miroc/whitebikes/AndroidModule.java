@@ -2,6 +2,7 @@ package sk.miroc.whitebikes;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.view.LayoutInflater;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,6 +28,12 @@ public class AndroidModule {
     @Singleton
     Resources provideResources() {
         return application.getResources();
+    }
+
+    @Provides
+    @Singleton
+    LayoutInflater provideLayoutInflater(Context context){
+        return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Provides

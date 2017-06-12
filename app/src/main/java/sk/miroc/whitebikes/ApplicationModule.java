@@ -27,7 +27,6 @@ public class ApplicationModule {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-
     @Provides
     @Singleton
     LoginService providesLoginService(CookiesRepository repository) {

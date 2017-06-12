@@ -11,6 +11,8 @@ public interface ProfileContract {
         void gotoLoginScreen();
 
         void setUserStatus(UserStatus userStatus);
+
+        void setUsername(String username);
     }
 
     interface Presenter extends BasePresenter {

@@ -1,5 +1,7 @@
 package sk.miroc.whitebikes.profile;
 
+import java.util.regex.Pattern;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,6 +31,7 @@ public class ProfilePresenter implements ProfileContract.Presenter{
         }
         loadUser();
     }
+
 
     private void loadUser() {
         api.getUserStatus("map:status").enqueue(new Callback<UserStatus>() {

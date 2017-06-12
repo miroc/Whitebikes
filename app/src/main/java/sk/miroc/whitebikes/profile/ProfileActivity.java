@@ -19,7 +19,7 @@ import sk.miroc.whitebikes.login.LoginActivity;
 public class ProfileActivity extends AppCompatActivity implements ProfileContract.View {
     @Inject ProfileContract.Presenter presenter;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.test_text) TextView testText;
+    @BindView(R.id.credit) TextView creditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileContrac
 
     @Override
     public void setUserStatus(UserStatus userStatus) {
-        testText.setText(userStatus.toString());
+        creditText.setText(getString(R.string.eur_credit, userStatus.getUsercredit()));
+    }
 
+    @Override
+    public void setUsername(String username) {
+        // TODO
+//        usernameText.setText(username);
     }
 }

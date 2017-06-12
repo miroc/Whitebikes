@@ -34,4 +34,7 @@
     <string name="loginSuccessful">Login succesful</string>
     <string name="logout">Logout</string>
     <string name="user_logged_out">User successfully logged out</string>
+    <string name="credit">Credit</string>
+
+    <string name="eur_credit">€ %s</string>
 </resources>

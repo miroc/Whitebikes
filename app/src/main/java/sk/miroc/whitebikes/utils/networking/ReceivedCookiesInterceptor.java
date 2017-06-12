@@ -2,8 +2,6 @@ package sk.miroc.whitebikes.utils.networking;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.Timer;
-import java.util.concurrent.ExecutionException;
 
 import okhttp3.Interceptor;
 import okhttp3.Response;

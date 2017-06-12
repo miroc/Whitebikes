@@ -2,6 +2,7 @@ package sk.miroc.whitebikes.profile;
 
 import dagger.Module;
 import dagger.Provides;
+import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.login.service.LoginService;
 
 @Module
@@ -18,7 +19,7 @@ class ProfilePresenterModule {
     }
 
     @Provides
-    ProfileContract.Presenter provideProfileContractPresenter(LoginService loginService){
-        return new ProfilePresenter(view, loginService);
+    ProfileContract.Presenter provideProfileContractPresenter(LoginService loginService, OldApi api){
+        return new ProfilePresenter(view, loginService, api);
     }
 }

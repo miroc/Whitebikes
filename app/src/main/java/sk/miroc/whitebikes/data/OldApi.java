@@ -10,6 +10,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import sk.miroc.whitebikes.data.models.Stand;
 import sk.miroc.whitebikes.data.models.StandBikes;
+import sk.miroc.whitebikes.data.models.UserStatus;
 
 /**
  * Created by miroc on 18/03/2017.
@@ -29,4 +30,9 @@ public interface OldApi {
     @FormUrlEncoded
     @POST("/command.php")
     Call<List<Stand>> login(@Query("action") String action, @Field("number") String number, @Field("password") String password);
+
+    // call with ?action=map:status
+    @GET("/command.php")
+    Call<UserStatus> getUserStatus(@Query("action") String action);
+
 }

@@ -1,5 +1,7 @@
 package sk.miroc.whitebikes.data;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -22,11 +24,12 @@ public class ClientModule {
                                             ReceivedCookiesInterceptor receivedCookiesInterceptor,
                                             @Named("isDebug") boolean isDebug){
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.followRedirects(false);
-        builder.addInterceptor(cookiesInterceptor);
-        builder.addInterceptor(receivedCookiesInterceptor);
+        builder.followRedirects(false)
+                .addInterceptor(cookiesInterceptor)
+                .addInterceptor(receivedCookiesInterceptor);
         if (isDebug){
-            builder.addInterceptor(loggingInterceptor);
+            builder.addNetworkInterceptor(new StethoInterceptor())
+                    .addInterceptor(loggingInterceptor);
         }
         return builder.build();
     }

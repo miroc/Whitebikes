@@ -18,9 +18,16 @@ public class AddCookiesInterceptor implements Interceptor {
     public Response intercept(Interceptor.Chain chain) throws IOException {
         Request.Builder builder = chain.request().newBuilder();
 
+        int i = 0;
+        StringBuilder sb = new StringBuilder();
         for (String cookie : repository.getSet()) {
-            builder.addHeader("Cookie", cookie);
+            if (i > 0){
+                sb.append("; ");
+            }
+            sb.append(cookie);
+            i += 1;
         }
+        builder.addHeader("Cookie", sb.toString());
         return chain.proceed(builder.build());
     }
 }

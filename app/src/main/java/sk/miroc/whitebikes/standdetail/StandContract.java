@@ -6,7 +6,6 @@ import java.util.List;
 import sk.miroc.whitebikes.base.BasePresenter;
 import sk.miroc.whitebikes.base.BaseView;
 import sk.miroc.whitebikes.data.models.Bike;
-import sk.miroc.whitebikes.data.models.UserStatus;
 
 public interface StandContract {
 
@@ -17,8 +16,11 @@ public interface StandContract {
         void loadStandPhoto(String standPhotoUrl);
 
         void addBikeButtons(List<Bike> bikes);
+
+        void gotoRentBikeScreen(Bike bike);
     }
 
     interface Presenter extends BasePresenter {
+        void rentBike(Bike bike);
     }
 }

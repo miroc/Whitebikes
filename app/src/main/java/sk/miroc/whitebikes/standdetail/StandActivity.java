@@ -1,11 +1,12 @@
 package sk.miroc.whitebikes.standdetail;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,7 @@ import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.data.models.Bike;
 import sk.miroc.whitebikes.data.models.Stand;
+import sk.miroc.whitebikes.rentbike.RentBikeActivity;
 
 public class StandActivity extends AppCompatActivity implements StandContract.View{
     public static final String EXTRA_STAND = "STAND";
@@ -70,12 +72,6 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
         presenter.start();
     }
 
-
-
-    private void askToRent(Bike bike) {
-
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == android.R.id.home) {
@@ -87,9 +83,7 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
     @Override
     public void setStandName(String text) {
         standNameText.setText(text);
-
     }
-
 
     @Override
     public void setStandDescription(String text) {
@@ -114,29 +108,32 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
     }
 
     @Override
+    public void gotoRentBikeScreen(Bike bike) {
+        Intent intent = new Intent(this, RentBikeActivity.class);
+        intent.putExtra(RentBikeActivity.EXTRA_BIKE, bike);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
     public void setPresenter(StandContract.Presenter presenter) {
         this.presenter = presenter;
     }
 
     private void onRentButtonClicked(View view) {
         Bike bike = (Bike) view.getTag();
-//        askToRent(bike);
-
         DialogFragment newFragment = RentBikeDialogFragment.newInstance(bike);
         newFragment.show(getSupportFragmentManager(), "dialog");
-
-//        Intent intent = new Intent(this, RentBikeActivity.class);
-//        // TODO first ask in a dialog
-//        intent.putExtra(RentBikeActivity.EXTRA_BIKE_NUMBER, bikeNumber);
-//        startActivity(intent);
-//        finish();
     }
 
+    public StandContract.Presenter getPresenter() {
+        return presenter;
+    }
 
     public static class RentBikeDialogFragment extends DialogFragment {
         static final String EXTRA_BIKE = "bike";
         public RentBikeDialogFragment() {
-            // Empty constructor required for DialogFragment
+            // Empty constructor required
         }
 
         private Bike bike;
@@ -154,7 +151,6 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             this.bike = getArguments().getParcelable(EXTRA_BIKE);
             AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-//            b.setTitle(getString(R.string.bike_number, bike.getBikeNumber()));
             String rentQuestion = String.format("Do you want to rent bike %s?", bike.getBikeNumber());
             if (bike.hasNote()){
                 b.setMessage("Note: " + bike.getNote() + "\n\n" + rentQuestion);
@@ -163,7 +159,11 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
             }
 
             b.setPositiveButton(R.string.rent, (dialog, which) -> {
-
+                FragmentActivity activity = getActivity();
+                if (activity != null && !activity.isFinishing() && activity instanceof StandActivity){
+                    StandActivity standActivity = (StandActivity) activity;
+                    standActivity.getPresenter().rentBike(bike);
+                }
             });
             b.setNegativeButton(R.string.cancel, (dialog, which) -> {
                 if (dialog != null){

@@ -16,7 +16,6 @@ public class StandPresenter implements StandContract.Presenter{
     private StandContract.View view;
     private Stand stand;
     private OldApi api;
-    private List<Bike> bikes;
 
     public StandPresenter(StandContract.View view, OldApi api, Stand stand){
         this.view = view;
@@ -55,7 +54,7 @@ public class StandPresenter implements StandContract.Presenter{
     }
 
     private void processBikes(StandBikes standBikes) {
-        bikes = new ArrayList<>();
+        List<Bike> bikes = new ArrayList<>();
         List<String> bikeNumbers = standBikes.getContent();
         for (int i = 0; i < bikeNumbers.size(); i++){
             String bikeNumber = bikeNumbers.get(i);
@@ -69,4 +68,10 @@ public class StandPresenter implements StandContract.Presenter{
         view.addBikeButtons(bikes);
     }
 
+    @Override
+    public void rentBike(Bike bike) {
+        // TODO implement logic
+        view.gotoRentBikeScreen(bike);
+
+    }
 }

@@ -17,6 +17,7 @@
 
     <string name="available_bikes">Available bikes:</string>
     <string name="bike_number">Bike %s</string>
+    <string name="rent_bike_number">Rent bike %s</string>
     <string name="title_activity_rent_bike">RentBikeActivity</string>
     <string name="open_code">Open code:</string>
     <string name="change_code_to">Change code immediately to:</string>
@@ -37,4 +38,6 @@
     <string name="credit">Credit</string>
 
     <string name="eur_credit">€ %s</string>
+    <string name="rent">Rent</string>
+    <string name="cancel">Cancel</string>
 </resources>

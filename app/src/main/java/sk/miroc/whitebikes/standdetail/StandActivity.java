@@ -1,9 +1,13 @@
 package sk.miroc.whitebikes.standdetail;
 
-import android.content.Context;
-import android.content.Intent;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -16,25 +20,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.OldApi;
+import sk.miroc.whitebikes.data.models.Bike;
 import sk.miroc.whitebikes.data.models.Stand;
-import sk.miroc.whitebikes.data.models.StandBikes;
-import sk.miroc.whitebikes.rentbike.RentBikeActivity;
-import timber.log.Timber;
 
-public class StandActivity extends AppCompatActivity {
+public class StandActivity extends AppCompatActivity implements StandContract.View{
     public static final String EXTRA_STAND = "STAND";
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.stand_name) TextView standNameText;
@@ -45,6 +43,7 @@ public class StandActivity extends AppCompatActivity {
 
     @Inject OldApi apiOld;
     @Inject LayoutInflater inflater;
+    private StandContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,66 +52,28 @@ public class StandActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Stand stand = getIntent().getParcelableExtra(EXTRA_STAND);
-
-        if (toolbar != null){
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        if (ab != null){
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setDisplayShowTitleEnabled(true);
+            ab.setTitle(" "); // TODO disable title in better way
         }
 
         ((WhiteBikesApp)getApplication()).getApplicationComponent().inject(this);
-
-        toolbarLayout.setTitle(" "); // TODO disable title in better way
-        standNameText.setText(stand.getStandName());
-        standDescriptionText.setText(stand.getStandDescription());
-
-        Call<StandBikes> call = apiOld.getStandBikes("list", stand.getStandName());
-
-        call.enqueue(new Callback<StandBikes>() {
-            @Override
-            public void onResponse(Call<StandBikes> call, Response<StandBikes> response) {
-                Timber.i("Loading stand bikes succeeded, response: %s", response.body());
-                Timber.d("StandBikes: %s", response.body());
-                addBikeButtons(response.body());
-            }
-            @Override
-            public void onFailure(Call<StandBikes> call, Throwable t) {
-                Timber.e(t, "loading stand bikes failed");
-            }
-        });
-
-        if (stand.getStandPhoto() != null && !stand.getStandPhoto().isEmpty()){
-            Glide.with(this).load(stand.getStandPhoto()).into(standImage);
-        }
+        new StandPresenter(this, apiOld, stand);
     }
 
-    private void addBikeButtons(StandBikes standBikes) {
-//        Timber.i("Adding bike buttons, obj: %s", bikeNumbersOrig);
-
-//        List<String> bikeNumbers = Arrays.asList("*23","133","7");
-        List<String> bikeNumbers = standBikes.getContent();
-        for (String bikeNumber : bikeNumbers){
-            boolean broken = false;
-            if (bikeNumber.startsWith("*")){
-                bikeNumber = bikeNumber.substring(1);
-                broken = true;
-            }
-            View v = inflater.inflate(!broken ? R.layout.button_bike : R.layout.button_bike_broken, null);
-            Button button = (Button) v.findViewById(R.id.button);
-            button.setText(getResources().getString(R.string.bike_number, bikeNumber));
-            button.setTag(Integer.parseInt(bikeNumber));
-            button.setOnClickListener(this::onRentButtonClicked);
-            bikesList.addView(v);
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.start();
     }
 
-    private void onRentButtonClicked(View view) {
-        int bikeNumber = (int) view.getTag();
-        Intent intent = new Intent(this, RentBikeActivity.class);
-        // TODO first ask in a dialog
-        intent.putExtra(RentBikeActivity.EXTRA_BIKE_NUMBER, bikeNumber);
-        startActivity(intent);
-        finish();
+
+
+    private void askToRent(Bike bike) {
+
     }
 
     @Override
@@ -123,8 +84,94 @@ public class StandActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(menuItem);
     }
 
+    @Override
+    public void setStandName(String text) {
+        standNameText.setText(text);
+
+    }
 
 
+    @Override
+    public void setStandDescription(String text) {
+        standDescriptionText.setText(text);
+    }
+
+    @Override
+    public void loadStandPhoto(String standPhotoUrl) {
+        Glide.with(this).load(standPhotoUrl).into(standImage);
+    }
+
+    @Override
+    public void addBikeButtons(List<Bike> bikes) {
+        for (Bike bike : bikes){
+            View v = inflater.inflate(!bike.hasNote() ? R.layout.button_bike : R.layout.button_bike_broken, null);
+            Button button = (Button) v.findViewById(R.id.button);
+            button.setText(getResources().getString(R.string.bike_number, bike.getBikeNumber()));
+            button.setTag(bike);
+            button.setOnClickListener(this::onRentButtonClicked);
+            bikesList.addView(v);
+        }
+    }
+
+    @Override
+    public void setPresenter(StandContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    private void onRentButtonClicked(View view) {
+        Bike bike = (Bike) view.getTag();
+//        askToRent(bike);
+
+        DialogFragment newFragment = RentBikeDialogFragment.newInstance(bike);
+        newFragment.show(getSupportFragmentManager(), "dialog");
+
+//        Intent intent = new Intent(this, RentBikeActivity.class);
+//        // TODO first ask in a dialog
+//        intent.putExtra(RentBikeActivity.EXTRA_BIKE_NUMBER, bikeNumber);
+//        startActivity(intent);
+//        finish();
+    }
 
 
+    public static class RentBikeDialogFragment extends DialogFragment {
+        static final String EXTRA_BIKE = "bike";
+        public RentBikeDialogFragment() {
+            // Empty constructor required for DialogFragment
+        }
+
+        private Bike bike;
+
+        public static RentBikeDialogFragment newInstance(Bike bike) {
+            RentBikeDialogFragment frag = new RentBikeDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelable(EXTRA_BIKE, bike);
+            frag.setArguments(args);
+            return frag;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            this.bike = getArguments().getParcelable(EXTRA_BIKE);
+            AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+//            b.setTitle(getString(R.string.bike_number, bike.getBikeNumber()));
+            String rentQuestion = String.format("Do you want to rent bike %s?", bike.getBikeNumber());
+            if (bike.hasNote()){
+                b.setMessage("Note: " + bike.getNote() + "\n\n" + rentQuestion);
+            } else {
+                b.setMessage(rentQuestion);
+            }
+
+            b.setPositiveButton(R.string.rent, (dialog, which) -> {
+
+            });
+            b.setNegativeButton(R.string.cancel, (dialog, which) -> {
+                if (dialog != null){
+                    dialog.dismiss();
+                }
+            });
+
+            return b.create();
+        }
+    }
 }

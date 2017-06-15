@@ -32,6 +32,8 @@ import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.OldApi;
 import sk.miroc.whitebikes.data.models.Bike;
 import sk.miroc.whitebikes.data.models.Stand;
+import sk.miroc.whitebikes.login.LoginActivity;
+import sk.miroc.whitebikes.login.service.LoginService;
 import sk.miroc.whitebikes.rentbike.RentBikeActivity;
 
 public class StandActivity extends AppCompatActivity implements StandContract.View{
@@ -45,6 +47,7 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
 
     @Inject OldApi apiOld;
     @Inject LayoutInflater inflater;
+    @Inject LoginService loginService;
     private StandContract.Presenter presenter;
 
     @Override
@@ -121,6 +124,11 @@ public class StandActivity extends AppCompatActivity implements StandContract.Vi
     }
 
     private void onRentButtonClicked(View view) {
+        if (!loginService.isUserLoggedIn()){
+            startActivity(new Intent(this, LoginActivity.class));
+            return;
+        }
+
         Bike bike = (Bike) view.getTag();
         DialogFragment newFragment = RentBikeDialogFragment.newInstance(bike);
         newFragment.show(getSupportFragmentManager(), "dialog");

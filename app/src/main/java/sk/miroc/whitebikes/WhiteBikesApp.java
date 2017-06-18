@@ -14,6 +14,8 @@ import timber.log.Timber;
 
 public class WhiteBikesApp extends Application {
     public static final String BASE_URL = "http://whitebikes.info/";
+    public static final String HELP_URL = "https://docs.google.com/document/d/1yEHbLEAU9waMiaxTqXFzZP0bLyRg7NMtN2dQUazro9o/edit";
+
     private ApplicationComponent applicationComponent;
 
     @Override

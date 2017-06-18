@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,7 +25,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +43,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
+import com.lapism.searchview.SearchView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -60,11 +67,16 @@ import sk.miroc.whitebikes.standdetail.StandActivity;
 import sk.miroc.whitebikes.utils.PermissionUtils;
 import timber.log.Timber;
 
+import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    @BindView(R.id.button_info) Button buttonInfo;
+    @BindView(R.id.button_return) Button buttonReturn;
     private GoogleMap map;
 
     @Inject Retrofit retrofit;
@@ -76,18 +88,24 @@ public class MapsActivity extends AppCompatActivity implements
     @BindView(R.id.navigation_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.bottom_sheet) LinearLayout bottomSheet;
+
+    private BottomSheetBehavior bottomSheetBehavior;
 
     private ActionBarDrawerToggle navDrawerToggle;
-
     private boolean permissionDenied = false;
     private GoogleApiClient googleApiClient;
     private Location lastLocation;
+    // TODO replace with actual call
+    private List<Stand> tempClosestStands;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
         ((WhiteBikesApp) getApplication()).getApplicationComponent().inject(this);
 
         if (toolbar != null) {
@@ -114,14 +132,19 @@ public class MapsActivity extends AppCompatActivity implements
         });
     }
 
-    private void navDrawerItemClicked(MenuItem item){
-        switch (item.getItemId()){
+    private void navDrawerItemClicked(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.profile: {
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 break;
             }
-
+            case R.id.help: {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(WhiteBikesApp.HELP_URL));
+                startActivity(i);
+                break;
+            }
             case R.id.logout: {
                 loginService.logout();
                 Toast.makeText(this, getString(R.string.user_logged_out), Toast.LENGTH_SHORT).show();
@@ -151,11 +174,11 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     @OnClick(R.id.find_my_location)
-    void onFindMyLocationClick(View view){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+    void onFindMyLocationClick(View view) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             Timber.i("Finding last location: %s", lastLocation);
-            if (lastLocation != null){
+            if (lastLocation != null) {
                 LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
@@ -214,7 +237,7 @@ public class MapsActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search_stands:
-                // TODO stand search
+//                searchView.open(true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -258,14 +281,16 @@ public class MapsActivity extends AppCompatActivity implements
         int greenColor = ContextCompat.getColor(this, R.color.green_bike);
         int blueColor = ContextCompat.getColor(this, R.color.blue_bike_repair);
 
+        this.tempClosestStands = stands.subList(0, 2);
+
 
         for (Stand stand : stands) {
             View v = inflater.inflate(R.layout.map_bike_icon, null);
             TextView bikeCountText = (TextView) v.findViewById(R.id.bike_count);
             ImageView bikeIcon = (ImageView) v.findViewById(R.id.bike_icon);
-            if (stand.getStandName().contains("SERVIS")){
+            if (stand.getStandName().contains("SERVIS")) {
                 bikeIcon.setColorFilter(blueColor);
-            } else if (stand.getBikecount().equals("0")){
+            } else if (stand.getBikecount().equals("0")) {
                 bikeIcon.setColorFilter(redColor);
             } else {
                 bikeIcon.setColorFilter(greenColor);
@@ -315,9 +340,9 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Timber.d("Connected to google location services");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (lastLocation != null){
+            if (lastLocation != null) {
                 LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
@@ -332,5 +357,26 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Timber.e("Unable to connect to google maps, connection result: %s", connectionResult);
+    }
+
+    @OnClick({R.id.button_info, R.id.button_return})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.button_info:
+                if (bottomSheetBehavior.getState() == STATE_COLLAPSED){
+                    bottomSheetBehavior.setState(STATE_EXPANDED);
+                } else if (bottomSheetBehavior.getState() == STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(STATE_COLLAPSED);
+                }
+                break;
+            case R.id.button_return:
+                if(tempClosestStands == null){
+                    return;
+                }
+                ArrayList<Stand> standArrayList = new ArrayList<>(tempClosestStands);
+                DialogFragment newFragment = ClosestStandDialogFragment.newInstance(standArrayList);
+                newFragment.show(getSupportFragmentManager(), "dialog");
+                break;
+        }
     }
 }

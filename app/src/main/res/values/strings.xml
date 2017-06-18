@@ -43,4 +43,6 @@
     <string name="search">Search</string>
     <string name="info">Info</string>
     <string name="return_word">Return</string>
+    <string name="closest_stands">Closest stands</string>
+    <string name="help">Help</string>
 </resources>

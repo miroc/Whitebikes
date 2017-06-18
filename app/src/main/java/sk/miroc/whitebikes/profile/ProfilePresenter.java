@@ -56,4 +56,11 @@ public class ProfilePresenter implements ProfileContract.Presenter{
             }
         });
     }
+
+    @Override
+    public void logout() {
+        loginService.logout();
+        view.informLogout();
+        view.closeScreen();
+    }
 }

@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import sk.miroc.whitebikes.R;
 import sk.miroc.whitebikes.WhiteBikesApp;
 import sk.miroc.whitebikes.data.models.UserStatus;
@@ -20,6 +23,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileContrac
     @Inject ProfileContract.Presenter presenter;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.credit) TextView creditText;
+    @BindView(R.id.logout_button) Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,20 @@ public class ProfileActivity extends AppCompatActivity implements ProfileContrac
     @Override
     public void setUsername(String username) {
         // TODO
-//        usernameText.setText(username);
+    }
+
+    @Override
+    public void informLogout() {
+        Toast.makeText(this, getString(R.string.user_logged_out), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void closeScreen() {
+        finish();
+    }
+
+    @OnClick(R.id.logout_button)
+    public void onViewClicked() {
+        presenter.logout();
     }
 }

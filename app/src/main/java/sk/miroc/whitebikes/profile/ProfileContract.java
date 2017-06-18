@@ -13,8 +13,13 @@ public interface ProfileContract {
         void setUserStatus(UserStatus userStatus);
 
         void setUsername(String username);
+
+        void informLogout();
+
+        void closeScreen();
     }
 
     interface Presenter extends BasePresenter {
+        void logout();
     }
 }

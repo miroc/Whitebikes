@@ -18,10 +18,10 @@
         android:icon="@drawable/ic_help_black_24dp"
         android:title="@string/help" />
 
-    <item
-        android:id="@+id/logout"
-        android:icon="@drawable/ic_power_settings_new_black_36dp"
-        android:title="@string/logout"/>
+    <!--<item-->
+        <!--android:id="@+id/logout"-->
+        <!--android:icon="@drawable/ic_power_settings_new_black_36dp"-->
+        <!--android:title="@string/logout"/>-->
 
 
 

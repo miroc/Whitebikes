@@ -145,14 +145,6 @@ public class MapsActivity extends AppCompatActivity implements
                 startActivity(i);
                 break;
             }
-            case R.id.logout: {
-                loginService.logout();
-                Toast.makeText(this, getString(R.string.user_logged_out), Toast.LENGTH_SHORT).show();
-
-                drawerLayout.closeDrawers();
-                break;
-            }
-
 //            case R.id.history:
 //                Timber.d("HISTORY CLICKED");
 //                break;

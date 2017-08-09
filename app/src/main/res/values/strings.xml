@@ -45,4 +45,5 @@
     <string name="return_word">Return</string>
     <string name="closest_stands">Closest stands</string>
     <string name="help">Help</string>
+    <string name="search_stand">Search stand</string>
 </resources>

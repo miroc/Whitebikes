@@ -1,6 +1,7 @@
 package sk.miroc.whitebikes.map;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,9 +18,11 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,7 +46,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
-import com.lapism.searchview.SearchView;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,20 +78,26 @@ public class MapsActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    @BindView(R.id.button_info) Button buttonInfo;
-    @BindView(R.id.button_return) Button buttonReturn;
     private GoogleMap map;
+
+
 
     @Inject Retrofit retrofit;
     @Inject OldApi oldApi;
     @Inject IconGenerator iconGenerator;
     @Inject LoginService loginService;
 
+    @BindView(R.id.button_info) Button buttonInfo;
+    @BindView(R.id.button_return) Button buttonReturn;
+
     @BindView(R.id.find_my_location) FloatingActionButton findMyLocationButton;
     @BindView(R.id.navigation_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.bottom_sheet) LinearLayout bottomSheet;
+
+    @BindView(R.id.search_view) MaterialSearchView searchView;
+
 
     private BottomSheetBehavior bottomSheetBehavior;
 
@@ -112,6 +121,7 @@ public class MapsActivity extends AppCompatActivity implements
             setSupportActionBar(toolbar);
         }
         initNavDrawer();
+        initSearchView();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -130,6 +140,47 @@ public class MapsActivity extends AppCompatActivity implements
             navDrawerItemClicked(item);
             return false;
         });
+    }
+
+    private void initSearchView() {
+        // TODO
+        // this is only temporary, set stands as adapter
+        // https://github.com/MiguelCatalan/MaterialSearchView
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void navDrawerItemClicked(MenuItem item) {
@@ -222,13 +273,18 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_maps, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(item);
+
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search_stands:
+            case R.id.action_search:
 //                searchView.open(true);
                 return true;
             default:
